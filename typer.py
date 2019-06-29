@@ -103,12 +103,15 @@ class Game:
         correct = len(self.correct)
         wrong = len(self.wrong)
         total = correct + wrong
-        print(f"Word accuracy: {correct}/{total}")
+        print(f"ACC: {correct/total*100:.2f}%")
 
         correct_chars = len(" ".join(self.correct))
+        cpm = 60 / self.game_time * correct_chars
+        print(f"CPM: {cpm:.2f}")
+
         correct_words = correct_chars / CHARS_PER_WORD
         wpm = 60 / self.game_time * correct_words
-        print(f"WPM: {wpm}")
+        print(f"WPM: {wpm:.2f}")
 
 
 def main():

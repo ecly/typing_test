@@ -69,43 +69,62 @@ class Game:
                 stdscr.addstr(target_char, curses.color_pair(2))
 
         stdscr.addstr(target[len(self.input) :])
+        stdscr.addstr("\n")
         stdscr.refresh()
 
-    def _game_loop(self, stdscr):
+
+    def _handle_key(self, key):
+        char = curses.keyname(key).decode()
+        if char == "^R":
+            self.restart()
+        if key in (curses.KEY_BACKSPACE, 127):
+            self.input = self.input[:-1]
+        elif chr(key) == " ":
+            self._finish_word_event()
+        else:
+            self.input += chr(key)
+
+    @staticmethod
+    def _setup_ncurses(stdscr):
+        # hide cursor
+        curses.curs_set(0)
+
+        # setup colors for printing text to screen
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_GREEN)
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_RED)
+
+        # don't wait for user input when calling getch()/getkey()
         stdscr.nodelay(True)
+
+        # allow 100ms sleep on getch()/getkey() avoiding busy-wait
+        # early returns when key is pressed, meaning no input delay
+        stdscr.timeout(100)
+
+    def _game_loop(self, stdscr):
+        self._setup_ncurses(stdscr)
         self._update_display(stdscr, self.game_time)
 
-        # get first key press
-        while True:
-            key = stdscr.getch()
-            if key != -1:
-                self.input += chr(key)
-                break
-
+        started = False
         start = time.time()
         time_left = self.game_time
         while time_left > 0:
-            key = stdscr.getch()
-            new_time_left = int(self.game_time - (time.time() - start))
+            if not started:
+                start = time.time()
 
+            key = stdscr.getch()
+            new_time_left = int(round(self.game_time - (time.time() - start)))
             if key == -1:
-                if new_time_left != time_left:
-                    self._update_display(stdscr, new_time_left)
+                # only update display when necessary
+                if time_left != new_time_left:
                     time_left = new_time_left
+                    self._update_display(stdscr, time_left)
 
                 continue
 
-            if key in (curses.KEY_BACKSPACE, 127):
-                self.input = self.input[:-1]
-            elif chr(key) == " ":
-                self._finish_word_event()
-            else:
-                self.input += chr(key)
-
-            self._update_display(stdscr, time_left)
             time_left = new_time_left
+            started = True
+            self._handle_key(key)
+            self._update_display(stdscr, time_left)
 
     def print_stats(self):
         """Print ACC/CPM/WPM to console"""
@@ -122,6 +141,12 @@ class Game:
         wpm = 60 / self.game_time * correct_words
         print(f"WPM: {int(round(wpm))}")
 
+    def restart(self):
+        self.input = ""
+        self.correct = []
+        self.wrong = []
+        self.next_words = [self._get_word() for _ in range(10)]
+        self.play()
 
     def play(self):
         """Start typing game and print results to terminal"""

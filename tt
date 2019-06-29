@@ -45,12 +45,16 @@ class Game:
 
     def calculate_cpm(self, time_played):
         """Calculate CPM given time_played in seconds"""
+        if time_played == 0:
+            return 0
         correct_chars = len(" ".join(self.correct))
         cpm = 60 / time_played * correct_chars
         return cpm
 
     def calculate_wpm(self, time_played):
         """Calculate WPM given time_played in seconds"""
+        if time_played == 0:
+            return 0
         correct_chars = len(" ".join(self.correct))
         wpm = 60 / time_played * correct_chars / CHARS_PER_WORD
         return wpm
@@ -70,10 +74,11 @@ class Game:
 
     def _update_display(self, stdscr, time_left):
         # TODO: display using two lines
-        _height, _width = stdscr.getmaxyx()
+        _height, width = stdscr.getmaxyx()
 
         stdscr.clear()
-        stdscr.addstr(f"Time left: {time_left}\n")
+        wpm = self.calculate_wpm(self.game_time - time_left)
+        stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
         target = " ".join(self.next_words)
         for idx, char in enumerate(self.input):
             target_char = target[idx]
@@ -82,8 +87,7 @@ class Game:
             else:
                 stdscr.addstr(target_char, curses.color_pair(2))
 
-        stdscr.addstr(target[len(self.input) :])
-        stdscr.addstr("\n")
+        stdscr.addstr(target[len(self.input) : width])
         stdscr.refresh()
 
     def _handle_key(self, key):

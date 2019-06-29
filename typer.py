@@ -54,6 +54,9 @@ class Game:
         self.input = ""
 
     def _update_display(self, stdscr, time_left):
+        # TODO: display using two lines
+        _height, _width = stdscr.getmaxyx()
+
         stdscr.clear()
         stdscr.addstr(f"Time left: {time_left}\n")
         target = " ".join(self.next_words)
@@ -70,8 +73,16 @@ class Game:
     def _game_loop(self, stdscr):
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_GREEN)
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_RED)
-
         stdscr.nodelay(True)
+        self._update_display(stdscr, self.game_time)
+
+        # get first key press
+        while True:
+            key = stdscr.getch()
+            if key != -1:
+                self.input += chr(key)
+                break
+
         start = time.time()
         time_left = self.game_time
         while time_left > 0:
@@ -107,11 +118,11 @@ class Game:
 
         correct_chars = len(" ".join(self.correct))
         cpm = 60 / self.game_time * correct_chars
-        print(f"CPM: {cpm:.2f}")
+        print(f"CPM: {int(round(cpm))}")
 
         correct_words = correct_chars / CHARS_PER_WORD
         wpm = 60 / self.game_time * correct_words
-        print(f"WPM: {wpm:.2f}")
+        print(f"WPM: {int(round(wpm))}")
 
 
 def main():

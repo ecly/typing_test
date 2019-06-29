@@ -1,6 +1,6 @@
 #!/bin/env python3
 """
-Minimal 10fastfingers like typing game using ncurses.
+Minimal 10fastfingers like typing game using Python3 with ncurses.
 Supports vocab files as arguments, as well as adjustable
 word length, game time and word frequency (if using sorted vocab).
 """
@@ -12,6 +12,8 @@ import curses
 # Used for WPM calculation
 CHARS_PER_WORD = 5
 
+QUEUE_SIZE = 10
+
 # pylint: disable=too-few-public-methods
 class Game:
     """
@@ -22,7 +24,7 @@ class Game:
     def __init__(self, args):
         self.word_generator = self._word_generator(args)
         self.game_time = args.game_time
-        self.next_words = [self._get_word() for _ in range(10)]
+        self.next_words = [self._get_word() for _ in range(QUEUE_SIZE)]
         self.correct = []
         self.wrong = []
         self.input = ""
@@ -40,6 +42,18 @@ class Game:
 
         while True:
             yield random.choice(words)
+
+    def calculate_cpm(self, time_played):
+        """Calculate CPM given time_played in seconds"""
+        correct_chars = len(" ".join(self.correct))
+        cpm = 60 / time_played * correct_chars
+        return cpm
+
+    def calculate_wpm(self, time_played):
+        """Calculate WPM given time_played in seconds"""
+        correct_chars = len(" ".join(self.correct))
+        wpm = 60 / time_played * correct_chars / CHARS_PER_WORD
+        return wpm
 
     def _get_word(self):
         return next(self.word_generator)
@@ -71,7 +85,6 @@ class Game:
         stdscr.addstr(target[len(self.input) :])
         stdscr.addstr("\n")
         stdscr.refresh()
-
 
     def _handle_key(self, key):
         char = curses.keyname(key).decode()
@@ -129,28 +142,28 @@ class Game:
     def print_stats(self):
         """Print ACC/CPM/WPM to console"""
         correct = len(self.correct)
-        wrong = len(self.wrong)
-        total = correct + wrong
+        total = correct + len(self.wrong)
         print(f"ACC: {correct/total*100:.2f}%")
-
-        correct_chars = len(" ".join(self.correct))
-        cpm = 60 / self.game_time * correct_chars
+        cpm = self.calculate_cpm(self.game_time)
         print(f"CPM: {int(round(cpm))}")
-
-        correct_words = correct_chars / CHARS_PER_WORD
-        wpm = 60 / self.game_time * correct_words
+        wpm = self.calculate_wpm(self.game_time)
         print(f"WPM: {int(round(wpm))}")
 
     def restart(self):
+        """
+        Reset the Game class, effective starting a new game
+        with new words, but based on same configuration.
+        """
         self.input = ""
         self.correct = []
         self.wrong = []
-        self.next_words = [self._get_word() for _ in range(10)]
+        self.next_words = [self._get_word() for _ in range(QUEUE_SIZE)]
         self.play()
 
     def play(self):
         """Start typing game and print results to terminal"""
         curses.wrapper(self._game_loop)
+
 
 def main():
     """Parse arguments and start game based thereof"""

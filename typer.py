@@ -9,7 +9,7 @@ import random
 import curses
 
 # Used for WPM calculation
-AVG_WORD_LENGTH = 5
+CHARS_PER_WORD = 5
 
 # pylint: disable=too-few-public-methods
 class Game:
@@ -105,8 +105,8 @@ class Game:
         total = correct + wrong
         print(f"Word accuracy: {correct}/{total}")
 
-        correct_chars = len("".join(self.correct))
-        correct_words = correct_chars / AVG_WORD_LENGTH
+        correct_chars = len(" ".join(self.correct))
+        correct_words = correct_chars / CHARS_PER_WORD
         wpm = 60 / self.game_time * correct_words
         print(f"WPM: {wpm}")
 

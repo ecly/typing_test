@@ -1,3 +1,4 @@
+#!/bin/env python3
 """
 Minimal 10fastfingers like typing game using ncurses.
 Supports vocab files as arguments, as well as adjustable
@@ -106,11 +107,8 @@ class Game:
             self._update_display(stdscr, time_left)
             time_left = new_time_left
 
-    def play(self):
-        """Start typing game and print results to terminal"""
-        curses.wrapper(self._game_loop)
-
-        # print stats
+    def print_stats(self):
+        """Print ACC/CPM/WPM to console"""
         correct = len(self.correct)
         wrong = len(self.wrong)
         total = correct + wrong
@@ -124,6 +122,10 @@ class Game:
         wpm = 60 / self.game_time * correct_words
         print(f"WPM: {int(round(wpm))}")
 
+
+    def play(self):
+        """Start typing game and print results to terminal"""
+        curses.wrapper(self._game_loop)
 
 def main():
     """Parse arguments and start game based thereof"""

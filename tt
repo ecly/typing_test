@@ -167,6 +167,7 @@ class Game:
     def play(self):
         """Start typing game and print results to terminal"""
         curses.wrapper(self._game_loop)
+        self.print_stats()
 
 
 def main():

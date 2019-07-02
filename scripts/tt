@@ -1,3 +1,4 @@
 #!/bin/env python3
+# pylint: disable=missing-docstring
 import typing_test
 typing_test.main()

@@ -5,6 +5,13 @@ Resembles the format from 10fastfingers.
 Supports configurable test duration, word length, vocab and more.  
 See `./tt --help` for all options.
 
+## Installation
+```bash
+git clone https://github.com/ecly/typing_test
+cd typing_test
+python3 setup.py install
+```
+
 Formatted using [black](https://github.com/ambv/black).
 
 ## License

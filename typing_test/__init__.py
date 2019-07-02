@@ -1,4 +1,3 @@
-#!/bin/env python3
 """
 Copyright (c) 2019 Emil Lynegaard
 Distributed under the MIT software license, see the
@@ -12,6 +11,9 @@ import argparse
 import time
 import random
 import curses
+import os
+
+VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "vocab")
 
 # Used for WPM calculation
 CHARS_PER_WORD = 5
@@ -184,7 +186,7 @@ def main():
         "--vocab",
         type=str,
         metavar="vocab-file-path",
-        default="vocab",
+        default=VOCAB_PATH,
         help="path to newline separated vocab file",
     )
     parser.add_argument(

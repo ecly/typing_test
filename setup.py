@@ -13,9 +13,12 @@ setup(
     author='Emil Lynegaard',
     author_email='ecly@mailbox.org',
     url="http://www.github.com/ecly/typing_test",
-    packages=[],
+    packages=["typing_test"],
+    package_data={
+        "typing_test": ["data/vocab"]
+    },
     install_requires=[],
-    scripts=['tt'],
+    scripts=['scripts/tt'],
     keywords=[
         "typing",
         "typing test",

@@ -3,7 +3,7 @@ Minimal command line game for measuring typing speed.
 Resembles the format from 10fastfingers.  
 
 Supports configurable test duration, word length, vocab and more.  
-See `./tt --help` for all options.
+See `.scripts/tt --help` for all options.
 
 ## Installation
 ```bash

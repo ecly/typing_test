@@ -18,9 +18,9 @@ VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "vocab")
 # Used for WPM calculation
 CHARS_PER_WORD = 5
 
-QUEUE_SIZE = 10
+QUEUE_SIZE = 30
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods, too-many-instance-attributes
 class Game:
     """
     Class encapsulating the Game.
@@ -31,9 +31,11 @@ class Game:
         self.word_generator = self._word_generator(args)
         self.game_time = args.game_time
         self.next_words = [self._get_word() for _ in range(QUEUE_SIZE)]
+        self.total = []
         self.correct = []
         self.wrong = []
         self.input = ""
+        self.display = args.display
 
     @staticmethod
     def _word_generator(args):
@@ -70,6 +72,7 @@ class Game:
 
     def _finish_word_event(self):
         target = self.next_words.pop(0)
+        self.total.append(target)
         if self.input == target:
             self.correct.append(target)
         else:
@@ -78,7 +81,7 @@ class Game:
         self.next_words.append(self._get_word())
         self.input = ""
 
-    def _update_display(self, stdscr, time_left):
+    def _progressive_display(self, stdscr, time_left):
         # TODO: display using two lines
         _height, width = stdscr.getmaxyx()
 
@@ -86,6 +89,7 @@ class Game:
         wpm = self.calculate_wpm(self.game_time - time_left)
         stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
         target = " ".join(self.next_words)
+
         for idx, char in enumerate(self.input):
             target_char = target[idx]
             if target_char == char:
@@ -93,8 +97,57 @@ class Game:
             else:
                 stdscr.addstr(target_char, curses.color_pair(2))
 
-        stdscr.addstr(target[len(self.input) : width])
+        stdscr.addstr(target[len(self.input) : width - 1])
+        stdscr.addstr(f"\n{self.input}", curses.A_UNDERLINE)
         stdscr.refresh()
+
+
+    def _get_line(self, words, max_chars):
+        line = []
+        chars = 0
+        for w in words:
+            length = len(w)
+            if chars + length + 1 > max_chars:
+                break
+            else:
+                line.append(w)
+                chars += length + 1
+
+        return line
+
+    def _10ff_display(self, stdscr, time_left):
+        # TODO: display using two lines
+        _height, width = stdscr.getmaxyx()
+
+        stdscr.clear()
+        wpm = self.calculate_wpm(self.game_time - time_left)
+        stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
+
+        input_line = self._get_line(self.next_words, width)
+        next_line = self._get_line(self.next_words[len(input_line):], width)
+
+        for idx, word in enumerate(input_line):
+            i = len(input_line) - idx
+            if i > 0 and i < len(self.total):
+                if word == self.total[i]:
+                    stdscr.addstr(word + " ", curses.color_pair(1))
+                else:
+                    stdscr.addstr(word + " ", curses.color_pair(2))
+
+            else:
+                stdscr.addstr(word)
+
+            stdscr.addstr(" ")
+
+        stdscr.addstr("\n" + " ".join(next_line))
+        stdscr.addstr(f"\n{self.input}", curses.A_UNDERLINE)
+        stdscr.refresh()
+
+    def _update_display(self, stdscr, time_left):
+        if self.display == "progressive":
+            self._progressive_display(stdscr, time_left)
+        elif self.display == "10ff":
+            self._10ff_display(stdscr, time_left)
 
     def _handle_key(self, key):
         char = curses.keyname(key).decode()
@@ -220,6 +273,14 @@ def main():
         metavar="words-to-read",
         default=1000,
         help="the amount of words to read from vocab file",
+    )
+    parser.add_argument(
+        "-d",
+        "--display",
+        type=str,
+        metavar="display",
+        default="progressive",
+        help="how to show upcoming words to type '10ff' or 'progressive'",
     )
     args = parser.parse_args()
     game = Game(args)

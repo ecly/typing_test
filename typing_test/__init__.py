@@ -305,7 +305,7 @@ def main():
         "--display",
         type=str,
         metavar="display",
-        default="progressive",
+        default="10ff",
         help="how to show upcoming words to type '10ff' or 'progressive'",
     )
     args = parser.parse_args()

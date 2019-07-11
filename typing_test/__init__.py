@@ -13,11 +13,15 @@ import random
 import curses
 import os
 
+# Robust path to default vocabulary, which is based on word frequency
+# from CNN and DailyMail articles.
 VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "vocab")
 
 # Used for WPM calculation
 CHARS_PER_WORD = 5
 
+# Amount of words to store, for showing several future words
+# Should generally be equal to at least two lines worth of words
 QUEUE_SIZE = 30
 
 # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -31,11 +35,18 @@ class Game:
         self.word_generator = self._word_generator(args)
         self.game_time = args.game_time
         self.next_words = [self._get_word() for _ in range(QUEUE_SIZE)]
-        self.total = []
+        self.typed = []
         self.correct = []
         self.wrong = []
         self.input = ""
+
         self.display = args.display
+
+        # if using 10ff display, we keep track of extra things
+        if self.display == "10ff":
+            self.offset = 0
+            self.current_line = []
+            self.next_line = []
 
     @staticmethod
     def _word_generator(args):
@@ -72,37 +83,20 @@ class Game:
 
     def _finish_word_event(self):
         target = self.next_words.pop(0)
-        self.total.append(target)
+        self.typed.append(self.input)
         if self.input == target:
             self.correct.append(target)
         else:
             self.wrong.append(target)
 
+        if self.display == "10ff":
+            self.offset += 1
+
         self.next_words.append(self._get_word())
         self.input = ""
 
-    def _progressive_display(self, stdscr, time_left):
-        # TODO: display using two lines
-        _height, width = stdscr.getmaxyx()
-
-        stdscr.clear()
-        wpm = self.calculate_wpm(self.game_time - time_left)
-        stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
-        target = " ".join(self.next_words)
-
-        for idx, char in enumerate(self.input):
-            target_char = target[idx]
-            if target_char == char:
-                stdscr.addstr(char, curses.color_pair(1))
-            else:
-                stdscr.addstr(target_char, curses.color_pair(2))
-
-        stdscr.addstr(target[len(self.input) : width - 1])
-        stdscr.addstr(f"\n{self.input}", curses.A_UNDERLINE)
-        stdscr.refresh()
-
-
-    def _get_line(self, words, max_chars):
+    @staticmethod
+    def _get_line(words, max_chars):
         line = []
         chars = 0
         for w in words:
@@ -115,31 +109,62 @@ class Game:
 
         return line
 
-    def _10ff_display(self, stdscr, time_left):
-        # TODO: display using two lines
+    def _progressive_display(self, stdscr, time_left):
         _height, width = stdscr.getmaxyx()
 
         stdscr.clear()
         wpm = self.calculate_wpm(self.game_time - time_left)
         stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
 
-        input_line = self._get_line(self.next_words, width)
-        next_line = self._get_line(self.next_words[len(input_line):], width)
+        line = self._get_line(self.next_words, width)
+        target = " ".join(line)
 
-        for idx, word in enumerate(input_line):
-            i = len(input_line) - idx
-            if i > 0 and i < len(self.total):
-                if word == self.total[i]:
-                    stdscr.addstr(word + " ", curses.color_pair(1))
-                else:
-                    stdscr.addstr(word + " ", curses.color_pair(2))
-
+        for idx, char in enumerate(self.input):
+            target_char = target[idx]
+            if target_char == char:
+                stdscr.addstr(char, curses.color_pair(1))
             else:
-                stdscr.addstr(word)
+                stdscr.addstr(target_char, curses.color_pair(2))
+
+        stdscr.addstr(target[len(self.input) : width - 1])
+        stdscr.addstr(f"\n{self.input}", curses.A_UNDERLINE)
+        stdscr.refresh()
+
+    def _10ff_display(self, stdscr, time_left):
+        _height, width = stdscr.getmaxyx()
+
+        stdscr.clear()
+
+        wpm = self.calculate_wpm(self.game_time - time_left)
+        stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
+
+        if not self.current_line:
+            self.current_line = self._get_line(self.next_words, width)
+            cur_len = len(self.current_line)
+            self.next_line = self._get_line(self.next_words[cur_len:], width)
+
+        if self.offset >= len(self.current_line):
+            self.current_line = self.next_line
+            cur_len = len(self.current_line)
+            self.next_line = self._get_line(self.next_words[cur_len:], width)
+            self.offset = 0
+
+        for i in range(self.offset):
+            target = self.current_line[i]
+            actual = (
+                self.typed[i]
+                if len(self.current_line) >= len(self.typed)
+                else self.typed[-(self.offset - i)]
+            )
+            if actual == target:
+                stdscr.addstr(target, curses.color_pair(1))
+            else:
+                stdscr.addstr(target, curses.color_pair(2))
 
             stdscr.addstr(" ")
 
-        stdscr.addstr("\n" + " ".join(next_line))
+        stdscr.addstr(" ".join(self.current_line[self.offset:]))
+        stdscr.addstr("\n" + " ".join(self.next_line))
         stdscr.addstr(f"\n{self.input}", curses.A_UNDERLINE)
         stdscr.refresh()
 
@@ -166,8 +191,9 @@ class Game:
         curses.curs_set(0)
 
         # setup colors for printing text to screen
-        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_GREEN)
-        curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_RED)
+        curses.use_default_colors()
+        curses.init_pair(1, curses.COLOR_GREEN, 0)
+        curses.init_pair(2, curses.COLOR_RED, 0)
 
         # don't wait for user input when calling getch()/getkey()
         stdscr.nodelay(True)

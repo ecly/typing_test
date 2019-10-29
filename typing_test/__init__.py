@@ -24,6 +24,8 @@ CHARS_PER_WORD = 5
 # Should generally be equal to at least two lines worth of words
 QUEUE_SIZE = 30
 
+MAX_WIDTH = 80
+
 # pylint: disable=too-few-public-methods, too-many-instance-attributes
 class Game:
     """
@@ -103,14 +105,15 @@ class Game:
             length = len(w)
             if chars + length + 1 > max_chars:
                 break
-            else:
-                line.append(w)
-                chars += length + 1
+
+            line.append(w)
+            chars += length + 1
 
         return line
 
     def _progressive_display(self, stdscr, time_left):
         _height, width = stdscr.getmaxyx()
+        width = min(width, MAX_WIDTH)
 
         stdscr.clear()
         wpm = self.calculate_wpm(self.game_time - time_left)
@@ -132,6 +135,7 @@ class Game:
 
     def _10ff_display(self, stdscr, time_left):
         _height, width = stdscr.getmaxyx()
+        width = min(width, MAX_WIDTH)
 
         stdscr.clear()
 

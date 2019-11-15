@@ -167,7 +167,7 @@ class Game:
 
             stdscr.addstr(" ")
 
-        stdscr.addstr(" ".join(self.current_line[self.offset:]))
+        stdscr.addstr(" ".join(self.current_line[self.offset :]))
         stdscr.addstr("\n" + " ".join(self.next_line))
         stdscr.addstr(f"\n{self.input}", curses.A_UNDERLINE)
         stdscr.refresh()
@@ -250,7 +250,14 @@ class Game:
         self.input = ""
         self.correct = []
         self.wrong = []
+        self.typed = []
         self.next_words = [self._get_word() for _ in range(QUEUE_SIZE)]
+
+        if self.display == "10ff":
+            self.offset = 0
+            self.current_line = []
+            self.next_line = []
+
         self.play()
 
     def play(self):

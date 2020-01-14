@@ -1,10 +1,14 @@
 # Typing Test
 ![](example.gif)
 
-Minimal Python3-based command line game for measuring typing speed with no dependencies.  
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ecly/typing_test/blob/master/LICENSE)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+Minimal based command line game for measuring typing speed with no dependencies.  
 Resembles the format from 10fastfingers.  
 
 Supports configurable display format, test duration, word length, vocab and more.  
+Use CTRL+R to restart and CTRL+C to exit.  
 See `tt --help` for all options.
 
 ## Recommended installation

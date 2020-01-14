@@ -1,18 +1,20 @@
 # Typing Test
-Minimal command line game for measuring typing speed.  
+![](example.gif)
+
+Minimal Python3-based command line game for measuring typing speed with no dependencies.  
 Resembles the format from 10fastfingers.  
 
-Supports configurable test duration, word length, vocab and more.  
-See `.scripts/tt --help` for all options.
+Supports configurable display format, test duration, word length, vocab and more.  
+See `tt --help` for all options.
 
-## Installation
+## Recommended installation
 ```bash
 git clone https://github.com/ecly/typing_test
 cd typing_test
-python3 setup.py install
+pip3 install . --user
 ```
 
-Formatted using [black](https://github.com/ambv/black).
+Code formatted with [black](https://github.com/ambv/black).
 
 ## License
 MIT License

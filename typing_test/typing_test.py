@@ -11,6 +11,7 @@ import argparse
 import time
 import random
 import curses
+import textwrap
 import os
 
 # Robust path to default vocabulary, which is based on word frequency
@@ -269,7 +270,16 @@ class Game:
 def main():
     """Parse arguments and start game based thereof"""
     parser = argparse.ArgumentParser(
-        description="Start a minimal 10fastfingers-like typing game on the command line"
+        formatter_class=argparse.RawTextHelpFormatter,
+        description=textwrap.dedent(
+            """\
+            Start a minimal 10fastfingers-like typing game on the command line.
+
+            Keybinds:
+                CTRL+R: restart
+                CTRL+C: exit
+            """
+        ),
     )
     parser.add_argument(
         "-v",

@@ -3,7 +3,7 @@ Copyright (c) 2019 Emil Lynegaard
 Distributed under the MIT software license, see the
 accompanying LICENSE.md or https://opensource.org/licenses/MIT
 
-Minimal 10fastfingers like typing game using Python3 with ncurses.
+Minimal 10fastfingers like typing game for Python2/3 with ncurses.
 Supports vocab files as arguments, as well as adjustable
 word length, game time and word frequency (if using sorted vocab).
 """

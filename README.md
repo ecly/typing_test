@@ -4,7 +4,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ecly/typing_test/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Minimal based command line game for measuring typing speed with no dependencies.  
+Minimal command line game for measuring typing speed with no dependencies.  
+Supports both Python2 and Python3.  
 Resembles the format from 10fastfingers.  
 
 Supports configurable display format, test duration, word length, vocab and more.  
@@ -15,10 +16,8 @@ See `tt --help` for all options.
 ```bash
 git clone https://github.com/ecly/typing_test
 cd typing_test
-pip3 install . --user
+pip install . --user
 ```
-
-Code formatted with [black](https://github.com/ambv/black).
 
 ## License
 MIT License

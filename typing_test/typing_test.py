@@ -69,16 +69,20 @@ class Game:
         """Calculate CPM given time_played in seconds"""
         if time_played == 0:
             return 0
+
         correct_chars = len(" ".join(self.correct))
         cpm = 60 / time_played * correct_chars
+        cpm = int(round(cpm))
         return cpm
 
     def calculate_wpm(self, time_played):
         """Calculate WPM given time_played in seconds"""
         if time_played == 0:
             return 0
+
         correct_chars = len(" ".join(self.correct))
         wpm = 60 / time_played * correct_chars / CHARS_PER_WORD
+        wpm = int(round(wpm))
         return wpm
 
     def _get_word(self):
@@ -118,7 +122,7 @@ class Game:
 
         stdscr.clear()
         wpm = self.calculate_wpm(self.game_time - time_left)
-        stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
+        stdscr.addstr("Time left: {:d}, WPM: {:d}\n".format(time_left, wpm))
 
         line = self._get_line(self.next_words, width)
         target = " ".join(line)
@@ -131,7 +135,7 @@ class Game:
                 stdscr.addstr(target_char, curses.color_pair(2))
 
         stdscr.addstr(target[len(self.input) : width - 1])
-        stdscr.addstr(f"\n{self.input}", curses.A_UNDERLINE)
+        stdscr.addstr("\n" + self.input, curses.A_UNDERLINE)
         stdscr.refresh()
 
     def _10ff_display(self, stdscr, time_left):
@@ -140,7 +144,7 @@ class Game:
         stdscr.clear()
 
         wpm = self.calculate_wpm(self.game_time - time_left)
-        stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
+        stdscr.addstr("Time left: {:d}, WPM: {:d}\n".format(time_left, wpm))
 
         # sets up initial lines
         if not self.current_line:
@@ -168,7 +172,7 @@ class Game:
 
         stdscr.addstr(" ".join(self.current_line[self.offset :]))
         stdscr.addstr("\n" + " ".join(self.next_line))
-        stdscr.addstr(f"\n{self.input}", curses.A_UNDERLINE)
+        stdscr.addstr("\n" + self.input, curses.A_UNDERLINE)
         stdscr.refresh()
 
     def _update_display(self, stdscr, time_left):
@@ -235,11 +239,12 @@ class Game:
         """Print ACC/CPM/WPM to console"""
         correct = len(self.correct)
         total = correct + len(self.wrong)
-        print(f"ACC: {correct/total*100:.2f}%")
+        accuracy = correct / total * 100
+        print("ACC: {:.2f}%".format(accuracy))
         cpm = self.calculate_cpm(self.game_time)
-        print(f"CPM: {int(round(cpm))}")
+        print("CPM: {:d}".format(cpm))
         wpm = self.calculate_wpm(self.game_time)
-        print(f"WPM: {int(round(wpm))}")
+        print("WPM: {:d}".format(wpm))
 
     def restart(self):
         """

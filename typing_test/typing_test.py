@@ -137,30 +137,28 @@ class Game:
     def _10ff_display(self, stdscr, time_left):
         _height, width = stdscr.getmaxyx()
         width = min(width, MAX_WIDTH)
-
         stdscr.clear()
 
         wpm = self.calculate_wpm(self.game_time - time_left)
         stdscr.addstr(f"Time left: {time_left}, WPM: {int(round(wpm))}\n")
 
+        # sets up initial lines
         if not self.current_line:
             self.current_line = self._get_line(self.next_words, width)
             cur_len = len(self.current_line)
             self.next_line = self._get_line(self.next_words[cur_len:], width)
 
+        # if we finished the current line
         if self.offset >= len(self.current_line):
             self.current_line = self.next_line
             cur_len = len(self.current_line)
             self.next_line = self._get_line(self.next_words[cur_len:], width)
             self.offset = 0
 
+        # color the words already typed on current line
         for i in range(self.offset):
             target = self.current_line[i]
-            actual = (
-                self.typed[i]
-                if len(self.current_line) >= len(self.typed)
-                else self.typed[-(self.offset - i)]
-            )
+            actual = self.typed[-(self.offset - i)]
             if actual == target:
                 stdscr.addstr(target, curses.color_pair(1))
             else:

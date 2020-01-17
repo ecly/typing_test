@@ -27,7 +27,7 @@ QUEUE_SIZE = 30
 
 MAX_WIDTH = 80
 
-# pylint: disable=too-few-public-methods, too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes
 class Game:
     """
     Class encapsulating the Game.

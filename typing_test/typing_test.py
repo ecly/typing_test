@@ -103,12 +103,13 @@ class Game:
     def _get_line(words, max_chars):
         line = []
         chars = 0
-        for w in words:
-            length = len(w)
+        for word in words:
+            length = len(word)
+            # use +1 to account for added whitespace
             if chars + length + 1 > max_chars:
                 break
 
-            line.append(w)
+            line.append(word)
             chars += length + 1
 
         return line

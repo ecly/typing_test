@@ -25,6 +25,7 @@ CHARS_PER_WORD = 5
 # Should generally be equal to at least two lines worth of words
 QUEUE_SIZE = 30
 
+# Maximum amount of characters to be displayed in a single row
 MAX_WIDTH = 80
 
 # pylint: disable=too-many-instance-attributes
@@ -77,12 +78,8 @@ class Game:
 
     def calculate_wpm(self, time_played):
         """Calculate WPM given time_played in seconds"""
-        if time_played == 0:
-            return 0
-
-        correct_chars = len(" ".join(self.correct))
-        wpm = 60 / time_played * correct_chars / CHARS_PER_WORD
-        wpm = int(round(wpm))
+        cpm = self.calculate_cpm(time_played)
+        wpm = cpm // CHARS_PER_WORD
         return wpm
 
     def _get_word(self):

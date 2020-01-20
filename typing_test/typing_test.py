@@ -35,13 +35,16 @@ class Game:
     Includes game stats, input management, game display.
     """
 
+    CORRECT_COLOR = 1
+    INCORRECT_COLOR = 2
+
     def __init__(self, args):
         self.word_generator = self._word_generator(args)
         self.game_time = args.game_time
         self.next_words = [self._get_word() for _ in range(QUEUE_SIZE)]
         self.typed = []
         self.correct = []
-        self.wrong = []
+        self.incorrect = []
         self.input = ""
 
         self.display = args.display
@@ -91,7 +94,7 @@ class Game:
         if self.input == target:
             self.correct.append(target)
         else:
-            self.wrong.append(target)
+            self.incorrect.append(target)
 
         if self.display == "10ff":
             self.offset += 1
@@ -128,9 +131,9 @@ class Game:
         for idx, char in enumerate(self.input):
             target_char = target[idx]
             if target_char == char:
-                stdscr.addstr(char, curses.color_pair(1))
+                stdscr.addstr(char, curses.color_pair(self.CORRECT_COLOR))
             else:
-                stdscr.addstr(target_char, curses.color_pair(2))
+                stdscr.addstr(target_char, curses.color_pair(self.INCORRECT_COLOR))
 
         stdscr.addstr(target[len(self.input) : width - 1])
         stdscr.addstr("\n" + self.input, curses.A_UNDERLINE)
@@ -162,9 +165,9 @@ class Game:
             target = self.current_line[i]
             actual = self.typed[-(self.offset - i)]
             if actual == target:
-                stdscr.addstr(target, curses.color_pair(1))
+                stdscr.addstr(target, curses.color_pair(self.CORRECT_COLOR))
             else:
-                stdscr.addstr(target, curses.color_pair(2))
+                stdscr.addstr(target, curses.color_pair(self.INCORRECT_COLOR))
 
             stdscr.addstr(" ")
 
@@ -197,8 +200,8 @@ class Game:
 
         # setup colors for printing text to screen
         curses.use_default_colors()
-        curses.init_pair(1, curses.COLOR_GREEN, 0)
-        curses.init_pair(2, curses.COLOR_RED, 0)
+        curses.init_pair(Game.CORRECT_COLOR, curses.COLOR_GREEN, 0)
+        curses.init_pair(Game.INCORRECT_COLOR, curses.COLOR_RED, 0)
 
         # don't wait for user input when calling getch()/getkey()
         stdscr.nodelay(True)
@@ -236,7 +239,7 @@ class Game:
     def print_stats(self):
         """Print ACC/CPM/WPM to console"""
         correct = len(self.correct)
-        total = correct + len(self.wrong)
+        total = correct + len(self.incorrect)
         accuracy = correct / total * 100
         print("ACC: {:.2f}%".format(accuracy))
         cpm = self.calculate_cpm(self.game_time)
@@ -251,7 +254,7 @@ class Game:
         """
         self.input = ""
         self.correct = []
-        self.wrong = []
+        self.incorrect = []
         self.typed = []
         self.next_words = [self._get_word() for _ in range(QUEUE_SIZE)]
 

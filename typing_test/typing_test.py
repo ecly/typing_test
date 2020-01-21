@@ -299,7 +299,7 @@ def main():
         type=int,
         metavar="gametime-seconds",
         default=60,
-        help="the duration in seconds of the typing game",
+        help="duration in seconds of the typing game",
     )
     parser.add_argument(
         "-min",
@@ -307,7 +307,7 @@ def main():
         type=int,
         metavar="min-word-length",
         default=2,
-        help="the minimum word length",
+        help="minimum word length",
     )
     parser.add_argument(
         "-max",
@@ -315,15 +315,23 @@ def main():
         type=int,
         metavar="max-word-length",
         default=10,
-        help="the maximum word length",
+        help="maximum word length",
     )
     parser.add_argument(
         "-w",
         "--words",
         type=int,
         metavar="words-to-read",
-        default=1000,
-        help="the amount of words to read from vocab file",
+        default=200,
+        help="the amount of words to read from vocab - higher increases difficulty",
+    )
+    parser.add_argument(
+        "-a",
+        "--advanced",
+        action="store_const",
+        const=1000,
+        dest="words",
+        help="use 1000 most common words (corresponds to 10ff advanced mode)",
     )
     parser.add_argument(
         "-d",
@@ -331,7 +339,7 @@ def main():
         type=str,
         metavar="display",
         default="10ff",
-        help="how to show upcoming words to type '10ff' or 'progressive'",
+        help="how to display words to type '10ff' or 'progressive'",
     )
     args = parser.parse_args()
     game = Game(args)

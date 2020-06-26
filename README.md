@@ -13,10 +13,15 @@ Use CTRL+R to restart and CTRL+C to exit.
 See `tt --help` for all options.
 
 ## Recommended installation
-```bash
+```sh
+python3 -m pip install typing_test --user
+```
+
+### Manual
+```sh
 git clone https://github.com/ecly/typing_test
 cd typing_test
-pip install . --user
+python3 -m pip install . --user
 ```
 
 ## License

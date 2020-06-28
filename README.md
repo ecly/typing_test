@@ -1,6 +1,7 @@
 # Typing Test
 ![](example.gif)
 
+[![PyPI Status](https://img.shields.io/pypi/v/typing_test)](https://pypi.org/project/typing-test/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ecly/typing_test/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -14,14 +15,14 @@ See `tt --help` for all options.
 
 ## Recommended installation
 ```sh
-python3 -m pip install typing_test --user
+python -m pip install typing_test --user
 ```
 
 ### Manual
 ```sh
 git clone https://github.com/ecly/typing_test
 cd typing_test
-python3 -m pip install . --user
+python -m pip install . --user
 ```
 
 ## License
